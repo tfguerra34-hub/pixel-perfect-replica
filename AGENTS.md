@@ -28,3 +28,9 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Multi-tenant: every tenant table carries restaurant_id and RLS uses public.is_member/is_manager; why: tenants must never see each other's data.
+- Public booking goes only through SECURITY DEFINER RPCs (get_public_restaurant, get_available_slots, create_public_reservation); why: anon has no table access.
+- Signed-in app lives under the pathless `_app` layout (ssr: false) which loads the membership and provides RestaurantProvider; why: session is in localStorage.
+- Brand name lives in src/lib/brand.ts; why: easy rename.
