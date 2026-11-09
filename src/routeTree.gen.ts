@@ -10,15 +10,28 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as RecuperarPasswordRouteImport } from './routes/recuperar-password'
 import { Route as RegistarRouteImport } from './routes/registar'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AppBloqueiosRouteImport } from './routes/_app/bloqueios'
+import { Route as AppClientesRouteImport } from './routes/_app/clientes'
+import { Route as AppDefinicoesRouteImport } from './routes/_app/definicoes'
+import { Route as AppMesasRouteImport } from './routes/_app/mesas'
+import { Route as AppNotificacoesRouteImport } from './routes/_app/notificacoes'
+import { Route as AppPainelRouteImport } from './routes/_app/painel'
+import { Route as AppReservasRouteImport } from './routes/_app/reservas'
+import { Route as RSlugRouteImport } from './routes/r.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -46,6 +59,46 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppBloqueiosRoute = AppBloqueiosRouteImport.update({
+  id: '/bloqueios',
+  path: '/bloqueios',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppClientesRoute = AppClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDefinicoesRoute = AppDefinicoesRouteImport.update({
+  id: '/definicoes',
+  path: '/definicoes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMesasRoute = AppMesasRouteImport.update({
+  id: '/mesas',
+  path: '/mesas',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotificacoesRoute = AppNotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPainelRoute = AppPainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReservasRoute = AppReservasRouteImport.update({
+  id: '/reservas',
+  path: '/reservas',
+  getParentRoute: () => AppRoute,
+} as any)
+const RSlugRoute = RSlugRouteImport.update({
+  id: '/r/$slug',
+  path: '/r/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +107,14 @@ export interface FileRoutesByFullPath {
   '/recuperar-password': typeof RecuperarPasswordRoute
   '/registar': typeof RegistarRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/bloqueios': typeof AppBloqueiosRoute
+  '/clientes': typeof AppClientesRoute
+  '/definicoes': typeof AppDefinicoesRoute
+  '/mesas': typeof AppMesasRoute
+  '/notificacoes': typeof AppNotificacoesRoute
+  '/painel': typeof AppPainelRoute
+  '/reservas': typeof AppReservasRoute
+  '/r/$slug': typeof RSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,15 +123,32 @@ export interface FileRoutesByTo {
   '/recuperar-password': typeof RecuperarPasswordRoute
   '/registar': typeof RegistarRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/bloqueios': typeof AppBloqueiosRoute
+  '/clientes': typeof AppClientesRoute
+  '/definicoes': typeof AppDefinicoesRoute
+  '/mesas': typeof AppMesasRoute
+  '/notificacoes': typeof AppNotificacoesRoute
+  '/painel': typeof AppPainelRoute
+  '/reservas': typeof AppReservasRoute
+  '/r/$slug': typeof RSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/recuperar-password': typeof RecuperarPasswordRoute
   '/registar': typeof RegistarRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_app/bloqueios': typeof AppBloqueiosRoute
+  '/_app/clientes': typeof AppClientesRoute
+  '/_app/definicoes': typeof AppDefinicoesRoute
+  '/_app/mesas': typeof AppMesasRoute
+  '/_app/notificacoes': typeof AppNotificacoesRoute
+  '/_app/painel': typeof AppPainelRoute
+  '/_app/reservas': typeof AppReservasRoute
+  '/r/$slug': typeof RSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +159,14 @@ export interface FileRouteTypes {
     | '/recuperar-password'
     | '/registar'
     | '/reset-password'
+    | '/bloqueios'
+    | '/clientes'
+    | '/definicoes'
+    | '/mesas'
+    | '/notificacoes'
+    | '/painel'
+    | '/reservas'
+    | '/r/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,23 +175,42 @@ export interface FileRouteTypes {
     | '/recuperar-password'
     | '/registar'
     | '/reset-password'
+    | '/bloqueios'
+    | '/clientes'
+    | '/definicoes'
+    | '/mesas'
+    | '/notificacoes'
+    | '/painel'
+    | '/reservas'
+    | '/r/$slug'
   id:
     | '__root__'
     | '/'
+    | '/_app'
     | '/login'
     | '/onboarding'
     | '/recuperar-password'
     | '/registar'
     | '/reset-password'
+    | '/_app/bloqueios'
+    | '/_app/clientes'
+    | '/_app/definicoes'
+    | '/_app/mesas'
+    | '/_app/notificacoes'
+    | '/_app/painel'
+    | '/_app/reservas'
+    | '/r/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
   RecuperarPasswordRoute: typeof RecuperarPasswordRoute
   RegistarRoute: typeof RegistarRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RSlugRoute: typeof RSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -115,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -152,16 +264,96 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/bloqueios': {
+      id: '/_app/bloqueios'
+      path: '/bloqueios'
+      fullPath: '/bloqueios'
+      preLoaderRoute: typeof AppBloqueiosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/clientes': {
+      id: '/_app/clientes'
+      path: '/clientes'
+      fullPath: '/clientes'
+      preLoaderRoute: typeof AppClientesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/definicoes': {
+      id: '/_app/definicoes'
+      path: '/definicoes'
+      fullPath: '/definicoes'
+      preLoaderRoute: typeof AppDefinicoesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/mesas': {
+      id: '/_app/mesas'
+      path: '/mesas'
+      fullPath: '/mesas'
+      preLoaderRoute: typeof AppMesasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/notificacoes': {
+      id: '/_app/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof AppNotificacoesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/painel': {
+      id: '/_app/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof AppPainelRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reservas': {
+      id: '/_app/reservas'
+      path: '/reservas'
+      fullPath: '/reservas'
+      preLoaderRoute: typeof AppReservasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/r/$slug': {
+      id: '/r/$slug'
+      path: '/r/$slug'
+      fullPath: '/r/$slug'
+      preLoaderRoute: typeof RSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppBloqueiosRoute: typeof AppBloqueiosRoute
+  AppClientesRoute: typeof AppClientesRoute
+  AppDefinicoesRoute: typeof AppDefinicoesRoute
+  AppMesasRoute: typeof AppMesasRoute
+  AppNotificacoesRoute: typeof AppNotificacoesRoute
+  AppPainelRoute: typeof AppPainelRoute
+  AppReservasRoute: typeof AppReservasRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppBloqueiosRoute: AppBloqueiosRoute,
+  AppClientesRoute: AppClientesRoute,
+  AppDefinicoesRoute: AppDefinicoesRoute,
+  AppMesasRoute: AppMesasRoute,
+  AppNotificacoesRoute: AppNotificacoesRoute,
+  AppPainelRoute: AppPainelRoute,
+  AppReservasRoute: AppReservasRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
   RecuperarPasswordRoute: RecuperarPasswordRoute,
   RegistarRoute: RegistarRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RSlugRoute: RSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
