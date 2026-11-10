@@ -15,7 +15,7 @@ export function ReservationList({ items, tables, showDate }: { items: Reservatio
 
   async function setStatus(r: Reservation, status: ReservationStatus) {
     const { error } = await supabase.from("reservations").update({ status }).eq("id", r.id);
-    if (error) return toast.error("Não foi possível atualizar.");
+    if (error) { toast.error("Não foi possível atualizar."); return; }
     toast.success(`Reserva: ${STATUS_LABEL[status]}`);
     qc.invalidateQueries({ queryKey: ["reservations"] });
   }

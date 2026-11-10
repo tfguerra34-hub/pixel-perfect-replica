@@ -46,7 +46,7 @@ export function ReservationDialog({ open, onOpenChange, reservation, walkIn }: {
       ({ error } = await supabase.from("reservations").insert({ ...payload, restaurant_id: restaurant.id, customer_id: c?.id ?? null, source: walkIn ? "walk-in" : "manual", status: walkIn ? "arrived" : "confirmed" }));
     }
     setBusy(false);
-    if (error) return toast.error("Não foi possível guardar a reserva.");
+    if (error) { toast.error("Não foi possível guardar a reserva."); return; }
     toast.success(reservation ? "Reserva atualizada." : "Reserva criada.");
     qc.invalidateQueries({ queryKey: ["reservations"] });
     qc.invalidateQueries({ queryKey: ["customers"] });

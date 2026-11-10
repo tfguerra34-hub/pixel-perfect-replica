@@ -70,7 +70,7 @@ function AppLayout() {
         const n = p.new as { title: string; body: string | null };
         toast(n.title, { description: n.body ?? undefined });
         if (typeof Notification !== "undefined" && Notification.permission === "granted" && document.hidden) {
-          new Notification(n.title, { body: n.body ?? undefined });
+          new Notification(n.title, n.body ? { body: n.body } : {});
         }
         qc.invalidateQueries({ queryKey: ["unread"] });
         qc.invalidateQueries({ queryKey: ["notifications"] });

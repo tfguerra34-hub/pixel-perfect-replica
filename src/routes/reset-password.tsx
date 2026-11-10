@@ -24,9 +24,9 @@ function Reset() {
   const [pw, setPw] = useState("");
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (pw.length < 8) return toast.error("A palavra-passe deve ter pelo menos 8 caracteres.");
+    if (pw.length < 8) { toast.error("A palavra-passe deve ter pelo menos 8 caracteres."); return; }
     const { error } = await supabase.auth.updateUser({ password: pw });
-    if (error) return toast.error("A ligação expirou. Peça uma nova.");
+    if (error) { toast.error("A ligação expirou. Peça uma nova."); return; }
     toast.success("Palavra-passe atualizada.");
     nav({ to: "/painel" });
   }

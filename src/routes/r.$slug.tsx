@@ -58,7 +58,7 @@ function Booking() {
     const { data, error } = await supabase.rpc("create_public_reservation", { _slug: slug, _date: date, _time: time!, _party: party, _name: f.name, _phone: f.phone, _notes: f.notes });
     setBusy(false);
     if (error) { setErr(error.message.includes("disponível") ? "Este horário acabou de ficar indisponível. Escolha outro." : "Não foi possível concluir a reserva."); slots.refetch(); return; }
-    setDone(data![0]);
+    setDone(data?.[0] ?? null);
   }
 
   if (rest.isLoading) return <div className="min-h-screen" />;

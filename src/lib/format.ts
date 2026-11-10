@@ -35,7 +35,7 @@ export function isoDate(d: Date) {
 
 export function parseIso(s: string) {
   const [y, m, d] = s.split("-").map(Number);
-  return new Date(y, m - 1, d);
+  return new Date(y ?? 0, (m ?? 1) - 1, d ?? 1);
 }
 
 /** DD/MM/YYYY */

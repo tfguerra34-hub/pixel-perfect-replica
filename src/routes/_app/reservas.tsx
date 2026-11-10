@@ -30,7 +30,7 @@ function Reservas() {
   const [status, setStatus] = useState<ReservationStatus | "all">("all");
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
-  const [from, to] = range(anchor, view);
+  const [from, to] = range(anchor, view) as [Date, Date];
   const res = useReservations(restaurant.id, isoDate(from), isoDate(to));
   const tables = useTableNames(restaurant.id);
 

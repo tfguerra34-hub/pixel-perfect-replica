@@ -31,10 +31,10 @@ function Mesas() {
   async function add(e: React.FormEvent) {
     e.preventDefault();
     const { error } = await supabase.from("tables").insert({ restaurant_id: restaurant.id, name: n.name, seats: n.seats, area: n.area || null });
-    if (error) return toast.error("Não foi possível adicionar a mesa.");
+    if (error) { toast.error("Não foi possível adicionar a mesa."); return; }
     setN({ name: "", seats: 2, area: "" }); refresh();
   }
-  async function update(id: string, patch: Record<string, unknown>) {
+  async function update(id: string, patch: { name?: string; seats?: number; area?: string | null; active?: boolean }) {
     await supabase.from("tables").update(patch).eq("id", id); refresh();
   }
   async function remove(id: string) {

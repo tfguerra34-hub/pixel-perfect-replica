@@ -38,17 +38,17 @@ function Register() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if ((f.password ?? "").length < 8) return toast.error("A palavra-passe deve ter pelo menos 8 caracteres.");
-    if (!/^\d{4}-\d{3}$/.test(f.postal_code ?? "")) return toast.error("Código postal inválido (formato 0000-000).");
+    if ((f["password"] ?? "").length < 8) { toast.error("A palavra-passe deve ter pelo menos 8 caracteres."); return; }
+    if (!/^\d{4}-\d{3}$/.test(f["postal_code"] ?? "")) { toast.error("Código postal inválido (formato 0000-000)."); return; }
     setBusy(true);
     const { email, password, ...meta } = f;
     const { error } = await supabase.auth.signUp({
-      email,
-      password,
+      email: email ?? "",
+      password: password ?? "",
       options: { emailRedirectTo: `${window.location.origin}/onboarding`, data: meta },
     });
     setBusy(false);
-    if (error) return toast.error(error.message.includes("registered") ? "Este e-mail já está registado." : "Não foi possível criar a conta.");
+    if (error) { toast.error(error.message.includes("registered") ? "Este e-mail já está registado." : "Não foi possível criar a conta."); return; }
     setSent(true);
   }
 
@@ -57,7 +57,7 @@ function Register() {
       <AuthShell title="Verifique o seu e-mail">
         <div className="rounded-xl border bg-card p-6 text-sm shadow-soft">
           <MailCheck className="mb-3 h-8 w-8 text-success" />
-          Enviámos uma ligação de confirmação para <strong>{f.email}</strong>. Abra-a para ativar a conta e configurar o restaurante.
+          Enviámos uma ligação de confirmação para <strong>{f["email"]}</strong>. Abra-a para ativar a conta e configurar o restaurante.
         </div>
       </AuthShell>
     );

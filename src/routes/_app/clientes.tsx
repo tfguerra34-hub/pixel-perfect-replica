@@ -39,7 +39,7 @@ function Clientes() {
 
   async function save(patch: { name?: string; phone?: string; notes?: string }) {
     const { error } = await supabase.from("customers").update(patch).eq("id", sel!);
-    if (error) return toast.error("Não foi possível guardar.");
+    if (error) { toast.error("Não foi possível guardar."); return; }
     toast.success("Cliente atualizado."); qc.invalidateQueries({ queryKey: ["customers"] });
   }
   async function erase() {

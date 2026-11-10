@@ -35,7 +35,7 @@ function Bloqueios() {
     const [ps, pe] = PRESETS[f.kind];
     const start = f.kind === "custom" ? f.start : ps;
     const end = f.kind === "custom" ? f.end : pe;
-    if (f.kind === "custom" && (!start || !end || start >= end)) return toast.error("Indique um intervalo de horas válido.");
+    if (f.kind === "custom" && (!start || !end || start >= end)) { toast.error("Indique um intervalo de horas válido."); return; }
     const dates: string[] = [];
     const d = new Date(f.date);
     const last = new Date(f.until || f.date);
@@ -43,7 +43,7 @@ function Bloqueios() {
     const { error } = await supabase.from("blocked_periods").insert(dates.map((date) => ({
       restaurant_id: restaurant.id, date, start_time: start || null, end_time: end || null, table_id: f.table_id || null, reason: f.reason || null,
     })));
-    if (error) return toast.error("Não foi possível criar o bloqueio.");
+    if (error) { toast.error("Não foi possível criar o bloqueio."); return; }
     toast.success("Bloqueio criado."); qc.invalidateQueries({ queryKey: ["blocks"] });
   }
   async function remove(id: string) {
