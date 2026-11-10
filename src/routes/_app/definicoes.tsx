@@ -34,7 +34,7 @@ function Definicoes() {
     const { id, owner_id, slug, created_at, suspended, ...patch } = f;
     void id; void owner_id; void slug; void created_at; void suspended;
     const { error } = await supabase.from("restaurants").update(patch).eq("id", restaurant.id);
-    if (error) return toast.error("Não foi possível guardar.");
+    if (error) { toast.error("Não foi possível guardar."); return; }
     toast.success("Definições guardadas."); qc.invalidateQueries({ queryKey: ["membership"] });
   }
 
@@ -130,10 +130,10 @@ function Horario({ edit }: { edit: boolean }) {
 
   const upd = (i: number, p: Partial<Row>) => setRows(rows.map((r, j) => (j === i ? { ...r, ...p } : r)));
   async function save() {
-    if (rows.some((r) => r.on && r.opens >= r.closes)) return toast.error("A hora de fecho deve ser posterior à de abertura.");
+    if (rows.some((r) => r.on && r.opens >= r.closes)) { toast.error("A hora de fecho deve ser posterior à de abertura."); return; }
     await supabase.from("opening_hours").delete().eq("restaurant_id", restaurant.id);
     const { error } = await supabase.from("opening_hours").insert(rows.filter((r) => r.on).map(({ on, ...r }) => { void on; return { ...r, restaurant_id: restaurant.id }; }));
-    if (error) return toast.error("Não foi possível guardar o horário.");
+    if (error) { toast.error("Não foi possível guardar o horário."); return; }
     toast.success("Horário guardado."); q.refetch();
   }
 

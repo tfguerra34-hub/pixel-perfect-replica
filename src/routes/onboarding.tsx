@@ -34,7 +34,7 @@ function Onboarding() {
       if (data?.length) nav({ to: "/painel" });
     });
     const m = user.user_metadata ?? {};
-    setF({ name: m.restaurant_name ?? "", phone: m.phone ?? "", address: m.address ?? "", postal_code: m.postal_code ?? "", city: m.city ?? "" });
+    setF({ name: m["restaurant_name"] ?? "", phone: m["phone"] ?? "", address: m["address"] ?? "", postal_code: m["postal_code"] ?? "", city: m["city"] ?? "" });
   }, [user, loading, nav]);
 
   async function submit(e: React.FormEvent) {
@@ -44,7 +44,7 @@ function Onboarding() {
       _name: f.name, _phone: f.phone, _address: f.address, _postal_code: f.postal_code, _city: f.city,
     });
     setBusy(false);
-    if (error) return toast.error("Não foi possível criar o restaurante.");
+    if (error) { toast.error("Não foi possível criar o restaurante."); return; }
     toast.success("Restaurante criado! Ajuste o horário e as mesas nas Definições.");
     nav({ to: "/painel" });
   }
