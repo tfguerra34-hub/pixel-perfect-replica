@@ -48,7 +48,15 @@ function Register() {
       options: { emailRedirectTo: `${window.location.origin}/onboarding`, data: meta },
     });
     setBusy(false);
-    if (error) { toast.error(error.message.includes("registered") ? "Este e-mail já está registado." : "Não foi possível criar a conta."); return; }
+    if (error) {
+      const msg = error.message ?? "";
+      if (msg.includes("weak_password") || msg.toLowerCase().includes("weak password"))
+        toast.error("Escolha uma palavra-passe mais forte — essa é demasiado comum.");
+      else if (msg.includes("registered")) toast.error("Este e-mail já está registado.");
+      else if (msg.includes("rate") || msg.includes("429")) toast.error("Demasiadas tentativas. Aguarde uns minutos e tente de novo.");
+      else toast.error("Não foi possível criar a conta.");
+      return;
+    }
     setSent(true);
   }
 
