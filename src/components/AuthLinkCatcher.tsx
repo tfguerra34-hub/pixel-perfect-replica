@@ -32,9 +32,7 @@ export function AuthLinkCatcher() {
         nav({ to: "/login" });
         return;
       }
-      if (history.replaceState(null, "", window.location.pathname + window.location.search)) {
-        // nothing to do, hash limpo
-      }
+      history.replaceState(null, "", window.location.pathname + window.location.search);
       nav({ to: type === "recovery" ? "/reset-password" : "/onboarding" });
     })();
   }, [session, loading, nav]);
