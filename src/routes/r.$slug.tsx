@@ -127,9 +127,9 @@ function Booking() {
               </div>
               {time && (
                 <form onSubmit={book} className="mt-6 space-y-4 border-t pt-6">
-                  <div className="space-y-2"><Label>Nome completo</Label><Input required minLength={2} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></div>
-                  <div className="space-y-2"><Label>Número de telemóvel</Label><Input required type="tel" placeholder="912 345 678" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></div>
-                  <div className="space-y-2"><Label>Observações especiais</Label><Textarea placeholder="Alergias, aniversário, cadeira de bebé…" value={f.notes} onChange={(e) => setF({ ...f, notes: e.target.value })} /></div>
+                  <div className="space-y-2"><Label htmlFor="bk-name">Nome completo</Label><Input id="bk-name" required minLength={2} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></div>
+                  <div className="space-y-2"><Label htmlFor="bk-phone">Número de telemóvel</Label><Input id="bk-phone" required type="tel" placeholder="912 345 678" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></div>
+                  <div className="space-y-2"><Label htmlFor="bk-notes">Observações especiais</Label><Textarea id="bk-notes" placeholder="Alergias, aniversário, cadeira de bebé…" value={f.notes} onChange={(e) => setF({ ...f, notes: e.target.value })} /></div>
                   {err && <p className="text-sm text-destructive">{err}</p>}
                   <Button type="submit" className="w-full" size="lg" disabled={busy}>{busy ? "A reservar…" : `Confirmar reserva · ${time}`}</Button>
                 </form>
