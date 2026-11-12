@@ -101,9 +101,12 @@ function AppLayout() {
       <div className="min-h-screen lg:pl-64">
         <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col bg-sidebar text-sidebar-foreground lg:flex">
           <div className="px-6 py-6"><Logo className="text-sidebar-accent-foreground" /></div>
-          <div className="mx-4 mb-4 rounded-lg bg-sidebar-accent px-3 py-2.5">
-            <p className="text-xs text-sidebar-foreground/60">Restaurante</p>
-            <p className="truncate text-sm font-semibold text-sidebar-accent-foreground">{restaurant.name}</p>
+          <div className="mx-4 mb-4 flex items-center gap-3 rounded-lg bg-sidebar-accent px-3 py-2.5">
+            {restaurant.logo_url && <img src={restaurant.logo_url} alt="" className="h-9 w-9 shrink-0 rounded-md object-cover" />}
+            <div className="min-w-0">
+              <p className="text-xs text-sidebar-foreground/60">Restaurante</p>
+              <p className="truncate text-sm font-semibold text-sidebar-accent-foreground">{restaurant.name}</p>
+            </div>
           </div>
           <nav className="flex-1 space-y-0.5 px-3">
             {NAV.map(({ to, label, icon: Icon }) => (
@@ -126,9 +129,12 @@ function AppLayout() {
         </aside>
 
         <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background/90 px-4 py-3 backdrop-blur lg:hidden">
-          <div>
+          <div className="flex items-center gap-2">
+            {restaurant.logo_url && <img src={restaurant.logo_url} alt="" className="h-8 w-8 rounded-md object-cover" />}
+            <div>
             <p className="text-xs text-muted-foreground">MesaGest</p>
             <p className="font-display text-lg font-medium leading-tight">{restaurant.name}</p>
+            </div>
           </div>
           <Link to="/notificacoes" className="relative rounded-full border bg-card p-2">
             <Bell className="h-5 w-5" />
