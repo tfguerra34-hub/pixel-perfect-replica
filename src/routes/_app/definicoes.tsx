@@ -2,7 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Copy } from "lucide-react";
+import { Copy, Check, ImagePlus, Trash2 } from "lucide-react";
+import { BRAND_COLORS } from "@/lib/brand";
+import { fileToDataUrl } from "@/lib/image";
+import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useRestaurant, canManage } from "@/hooks/useRestaurant";
 import { PageHeader } from "@/components/PageHeader";
@@ -38,7 +41,7 @@ function Definicoes() {
     toast.success("Definições guardadas."); qc.invalidateQueries({ queryKey: ["membership"] });
   }
 
-  const text = (k: "name" | "phone" | "website" | "address" | "postal_code" | "city" | "logo_url" | "cover_url", l: string) => (
+  const text = (k: "name" | "phone" | "website" | "address" | "postal_code" | "city", l: string) => (
     <div className="space-y-2"><Label>{l}</Label><Input disabled={!edit} value={(f[k] as string) ?? ""} onChange={(e) => setF({ ...f, [k]: e.target.value })} /></div>
   );
   const num = (k: "slot_interval" | "table_duration" | "max_party" | "min_notice_minutes" | "max_advance_days", l: string) => (
@@ -66,7 +69,19 @@ function Definicoes() {
               {text("name", "Nome do restaurante")}{text("phone", "Telefone")}
               {text("address", "Morada")}{text("website", "Website")}
               {text("postal_code", "Código postal")}{text("city", "Cidade")}
-              {text("logo_url", "Logótipo (URL da imagem)")}{text("cover_url", "Imagem de capa (URL)")}
+              <ImageField label="Logótipo" hint="Aparece pequeno ao lado do nome." value={f.logo_url} square disabled={!edit} onChange={(v) => setF({ ...f, logo_url: v })} max={256} />
+              <ImageField label="Imagem de capa (página de reservas)" hint="Recomendado: horizontal, 1600×600." value={f.cover_url} disabled={!edit} onChange={(v) => setF({ ...f, cover_url: v })} max={1600} />
+              <div className="space-y-2 sm:col-span-2"><Label>Cor principal da página de reservas</Label>
+                <div className="flex flex-wrap gap-3">
+                  {BRAND_COLORS.map((c) => { const on = (f.brand_color ?? BRAND_COLORS[0]!.value) === c.value; return (
+                    <button key={c.value} type="button" disabled={!edit} title={c.name} onClick={() => setF({ ...f, brand_color: c.value })}
+                      className={cn("flex flex-col items-center gap-1 text-xs text-muted-foreground disabled:opacity-60")}>
+                      <span className={cn("grid h-10 w-10 place-items-center rounded-full ring-offset-2 ring-offset-card", on && "ring-2 ring-foreground")} style={{ background: c.value }}>
+                        {on && <Check className="h-4 w-4 text-primary-foreground" />}
+                      </span>{c.name}
+                    </button>); })}
+                </div>
+              </div>
               <div className="space-y-2 sm:col-span-2"><Label>Descrição</Label><Textarea disabled={!edit} value={f.description ?? ""} onChange={(e) => setF({ ...f, description: e.target.value })} /></div>
             </div>
             {edit && <Button className="mt-5" onClick={save}>Guardar alterações</Button>}
@@ -156,6 +171,31 @@ function Horario({ edit }: { edit: boolean }) {
         ))}
       </div>
       {edit && <Button className="mt-5" onClick={save}>Guardar horário</Button>}
+    </div>
+  );
+}
+
+function ImageField({ label, hint, value, onChange, disabled, square, max }: { label: string; hint: string; value: string | null; onChange: (v: string | null) => void; disabled: boolean; square?: boolean; max: number }) {
+  async function pick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]; e.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Escolha um ficheiro de imagem."); return; }
+    try { onChange(await fileToDataUrl(file, max)); } catch { toast.error("Não foi possível ler a imagem."); }
+  }
+  return (
+    <div className="space-y-2"><Label>{label}</Label>
+      <div className="flex items-center gap-3">
+        <div className={cn("grid shrink-0 place-items-center overflow-hidden rounded-lg border bg-muted", square ? "h-16 w-16" : "h-16 w-28")}>
+          {value ? <img src={value} alt="" className="h-full w-full object-cover" /> : <ImagePlus className="h-5 w-5 text-muted-foreground" />}
+        </div>
+        {!disabled && <div className="flex flex-col gap-1.5">
+          <label className="inline-flex cursor-pointer items-center rounded-md border px-3 py-1.5 text-sm hover:bg-muted">
+            {value ? "Trocar imagem" : "Carregar imagem"}<input type="file" accept="image/*" className="hidden" onChange={pick} />
+          </label>
+          {value && <button type="button" onClick={() => onChange(null)} className="inline-flex items-center gap-1 text-xs text-destructive"><Trash2 className="h-3 w-3" />Remover</button>}
+        </div>}
+      </div>
+      <p className="text-xs text-muted-foreground">{hint}</p>
     </div>
   );
 }

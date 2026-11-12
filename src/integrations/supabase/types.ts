@@ -286,6 +286,7 @@ export type Database = {
         Row: {
           address: string | null
           auto_confirm: boolean
+          brand_color: string | null
           city: string | null
           cover_url: string | null
           created_at: string
@@ -308,6 +309,7 @@ export type Database = {
         Insert: {
           address?: string | null
           auto_confirm?: boolean
+          brand_color?: string | null
           city?: string | null
           cover_url?: string | null
           created_at?: string
@@ -330,6 +332,7 @@ export type Database = {
         Update: {
           address?: string | null
           auto_confirm?: boolean
+          brand_color?: string | null
           city?: string | null
           cover_url?: string | null
           created_at?: string
@@ -453,6 +456,7 @@ export type Database = {
         Args: { _slug: string }
         Returns: {
           address: string
+          brand_color: string
           city: string
           cover_url: string
           description: string

@@ -66,7 +66,7 @@ function Booking() {
   const r = rest.data;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" style={r.brand_color ? ({ "--primary": r.brand_color, "--ring": r.brand_color } as React.CSSProperties) : undefined}>
       <div className="relative h-48 sm:h-64">
         <img src={r.cover_url || hero} alt="" className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 to-transparent" />
