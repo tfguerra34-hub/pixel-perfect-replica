@@ -73,7 +73,7 @@ function Definicoes() {
               <ImageField label="Imagem de capa (página de reservas)" hint="Recomendado: horizontal, 1600×600." value={f.cover_url} disabled={!edit} onChange={(v) => setF({ ...f, cover_url: v })} max={1600} />
               <div className="space-y-2 sm:col-span-2"><Label>Cor principal da página de reservas</Label>
                 <div className="flex flex-wrap gap-3">
-                  {BRAND_COLORS.map((c) => { const on = (f.brand_color ?? BRAND_COLORS[0].value) === c.value; return (
+                  {BRAND_COLORS.map((c) => { const on = (f.brand_color ?? BRAND_COLORS[0]!.value) === c.value; return (
                     <button key={c.value} type="button" disabled={!edit} title={c.name} onClick={() => setF({ ...f, brand_color: c.value })}
                       className={cn("flex flex-col items-center gap-1 text-xs text-muted-foreground disabled:opacity-60")}>
                       <span className={cn("grid h-10 w-10 place-items-center rounded-full ring-offset-2 ring-offset-card", on && "ring-2 ring-foreground")} style={{ background: c.value }}>
