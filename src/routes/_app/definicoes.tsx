@@ -160,17 +160,21 @@ function Horario({ edit }: { edit: boolean }) {
     <div className="rounded-xl border bg-card p-5 shadow-soft">
       <div className="space-y-1">
         {[1, 2, 3, 4, 5, 6, 0].map((wd) => (
-          <div key={wd} className="grid items-center gap-2 border-b py-3 last:border-0 sm:grid-cols-[140px_1fr_1fr]">
+          <div key={wd} className="grid min-w-0 items-center gap-3 border-b py-4 last:border-0 md:grid-cols-[130px_minmax(0,1fr)]">
             <p className="font-semibold">{WEEKDAYS[wd]}</p>
-            {rows.map((r, i) => r.weekday !== wd ? null : (
-              <div key={r.service} className="flex items-center gap-2 text-sm">
-                <Switch disabled={!edit} checked={r.on} onCheckedChange={(v) => upd(i, { on: v })} />
-                <span className="w-14 text-muted-foreground">{r.service === "lunch" ? "Almoço" : "Jantar"}</span>
-                <Input type="time" disabled={!edit || !r.on} value={r.opens} onChange={(e) => upd(i, { opens: e.target.value })} className="h-8 w-28" />
-                <span>–</span>
-                <Input type="time" disabled={!edit || !r.on} value={r.closes} onChange={(e) => upd(i, { closes: e.target.value })} className="h-8 w-28" />
-              </div>
-            ))}
+            <div className="grid min-w-0 gap-3 xl:grid-cols-2">
+              {rows.map((r, i) => r.weekday !== wd ? null : (
+                <div key={r.service} className="grid min-w-0 grid-cols-[auto_3.5rem_minmax(0,1fr)] items-center gap-x-2 gap-y-3 text-sm sm:grid-cols-[auto_3.5rem_minmax(0,7rem)_auto_minmax(0,7rem)]">
+                  <Switch disabled={!edit} checked={r.on} onCheckedChange={(v) => upd(i, { on: v })} />
+                  <span className="text-muted-foreground">{r.service === "lunch" ? "Almoço" : "Jantar"}</span>
+                  <div className="col-span-3 grid min-w-0 grid-cols-[minmax(0,7rem)_auto_minmax(0,7rem)] items-center justify-start gap-2 sm:col-span-1 sm:contents">
+                    <Input type="time" aria-label={`${WEEKDAYS[wd]} — abertura de ${r.service === "lunch" ? "almoço" : "jantar"}`} disabled={!edit || !r.on} value={r.opens} onChange={(e) => upd(i, { opens: e.target.value })} className="h-8 w-full min-w-0" />
+                    <span aria-hidden="true">–</span>
+                    <Input type="time" aria-label={`${WEEKDAYS[wd]} — fecho de ${r.service === "lunch" ? "almoço" : "jantar"}`} disabled={!edit || !r.on} value={r.closes} onChange={(e) => upd(i, { closes: e.target.value })} className="h-8 w-full min-w-0" />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
