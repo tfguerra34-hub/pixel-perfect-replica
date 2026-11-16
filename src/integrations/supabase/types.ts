@@ -294,6 +294,7 @@ export type Database = {
           id: string
           logo_url: string | null
           max_advance_days: number
+          max_covers_per_slot: number | null
           max_party: number
           min_notice_minutes: number
           name: string
@@ -317,6 +318,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           max_advance_days?: number
+          max_covers_per_slot?: number | null
           max_party?: number
           min_notice_minutes?: number
           name: string
@@ -340,6 +342,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           max_advance_days?: number
+          max_covers_per_slot?: number | null
           max_party?: number
           min_notice_minutes?: number
           name?: string
