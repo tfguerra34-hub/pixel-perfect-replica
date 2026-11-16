@@ -15,6 +15,13 @@
       "when": 1794443048755,
       "tag": "0001_restaurant_brand_color",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794839964143,
+      "tag": "0002_max_covers_per_slot",
+      "breakpoints": true
     }
   ]
 }
