@@ -102,6 +102,10 @@ function Definicoes() {
               {num("max_party", "Máximo de pessoas por reserva")}
               {num("min_notice_minutes", "Antecedência mínima (min)")}
               {num("max_advance_days", "Reservar até (dias de antecedência)")}
+              <div className="space-y-2"><Label>Máximo de pessoas por horário</Label>
+                <Input disabled={!edit} type="number" min={1} placeholder="Sem limite" value={f.max_covers_per_slot ?? ""} onChange={(e) => setF({ ...f, max_covers_per_slot: e.target.value ? Number(e.target.value) : null })} />
+                <p className="text-xs text-muted-foreground">Quando um horário chega a este número, deixa de aparecer na página de reservas.</p>
+              </div>
             </div>
             <label className="mt-5 flex items-center gap-3 text-sm">
               <Switch disabled={!edit} checked={f.auto_confirm} onCheckedChange={(v) => setF({ ...f, auto_confirm: v })} />
