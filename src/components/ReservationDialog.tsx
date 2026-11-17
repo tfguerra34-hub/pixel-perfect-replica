@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { isoDate } from "@/lib/format";
+import { reservationErrorMessage } from "@/lib/reservation-rules";
 import type { Database } from "@/integrations/supabase/types";
 
 export type Reservation = Database["public"]["Tables"]["reservations"]["Row"];
@@ -31,9 +32,19 @@ export function ReservationDialog({ open, onOpenChange, reservation, walkIn }: {
   }, [open, reservation, walkIn]);
 
   const tables = useQuery({
-    queryKey: ["tables", restaurant.id],
-    queryFn: async () => (await supabase.from("tables").select("*").eq("restaurant_id", restaurant.id).eq("active", true).order("name")).data ?? [],
+    queryKey: ["available-tables", restaurant.id, f.date, f.time, f.party_size, reservation?.id],
+    enabled: open && !!f.date && !!f.time && f.party_size > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_available_tables", { _rid: restaurant.id, _date: f.date, _time: f.time, _party: Number(f.party_size), _exclude: reservation?.id });
+      if (error) throw error;
+      return data ?? [];
+    },
   });
+
+  useEffect(() => {
+    if (!open || !f.table_id || !tables.data) return;
+    if (!tables.data.some((t) => t.id === f.table_id)) setF((current) => ({ ...current, table_id: "" }));
+  }, [open, f.table_id, tables.data]);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -46,10 +57,11 @@ export function ReservationDialog({ open, onOpenChange, reservation, walkIn }: {
       ({ error } = await supabase.from("reservations").insert({ ...payload, restaurant_id: restaurant.id, customer_id: c?.id ?? null, source: walkIn ? "walk-in" : "manual", status: walkIn ? "arrived" : "confirmed" }));
     }
     setBusy(false);
-    if (error) { toast.error("Não foi possível guardar a reserva."); return; }
-    toast.success(reservation ? "Reserva atualizada." : "Reserva criada.");
+    if (error) { toast.error(reservationErrorMessage(error.message)); return; }
+    toast.success(reservation ? "Reserva atualizada." : `Reserva criada${payload.table_id ? "." : " com mesa atribuída automaticamente."}`);
     qc.invalidateQueries({ queryKey: ["reservations"] });
     qc.invalidateQueries({ queryKey: ["customers"] });
+    qc.invalidateQueries({ queryKey: ["available-tables"] });
     onOpenChange(false);
   }
 
@@ -65,10 +77,13 @@ export function ReservationDialog({ open, onOpenChange, reservation, walkIn }: {
           <div className="space-y-2"><Label>Número de pessoas</Label><Input required type="number" min={1} value={f.party_size} onChange={(e) => setF({ ...f, party_size: Number(e.target.value) })} /></div>
           <div className="space-y-2"><Label>Mesa</Label>
             <select className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm" value={f.table_id} onChange={(e) => setF({ ...f, table_id: e.target.value })}>
-              <option value="">Sem mesa</option>
+              <option value="">Automática</option>
               {tables.data?.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.seats} lug.)</option>)}
             </select>
           </div>
+          <p className="col-span-2 -mt-2 text-xs text-muted-foreground">
+            {tables.isLoading ? "A verificar mesas livres…" : tables.data?.length ? "Só aparecem mesas com lugares e horário livres. Em Automática, escolhemos a mais adequada." : "Sem mesas livres para estes dados. Experimente outra hora ou mesa."}
+          </p>
           <div className="col-span-2 space-y-2"><Label>Observações</Label><Textarea value={f.notes} onChange={(e) => setF({ ...f, notes: e.target.value })} /></div>
           <Button type="submit" className="col-span-2" disabled={busy}>{busy ? "A guardar…" : "Guardar"}</Button>
         </form>

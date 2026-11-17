@@ -22,6 +22,20 @@
       "when": 1794839964143,
       "tag": "0002_max_covers_per_slot",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794955300708,
+      "tag": "0003_protect_reservation_availability",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794955374947,
+      "tag": "0004_allow_status_updates_for_existing_reservations",
+      "breakpoints": true
     }
   ]
 }

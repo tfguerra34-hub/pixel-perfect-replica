@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ReservationDialog, type Reservation } from "@/components/ReservationDialog";
 import { STATUS_LABEL, STATUS_VARIANT, formatDate, formatTime, type ReservationStatus } from "@/lib/format";
+import { reservationErrorMessage } from "@/lib/reservation-rules";
 
 export function ReservationList({ items, tables, showDate }: { items: Reservation[]; tables: Record<string, string>; showDate?: boolean }) {
   const qc = useQueryClient();
@@ -15,9 +16,10 @@ export function ReservationList({ items, tables, showDate }: { items: Reservatio
 
   async function setStatus(r: Reservation, status: ReservationStatus) {
     const { error } = await supabase.from("reservations").update({ status }).eq("id", r.id);
-    if (error) { toast.error("Não foi possível atualizar."); return; }
+    if (error) { toast.error(reservationErrorMessage(error.message, "Não foi possível atualizar.")); return; }
     toast.success(`Reserva: ${STATUS_LABEL[status]}`);
     qc.invalidateQueries({ queryKey: ["reservations"] });
+    qc.invalidateQueries({ queryKey: ["available-tables"] });
   }
 
   if (!items.length)

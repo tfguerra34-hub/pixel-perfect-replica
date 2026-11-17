@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { isoDate } from "@/lib/format";
+import { reservationErrorMessage } from "@/lib/reservation-rules";
 
 export const Route = createFileRoute("/_app/mesas")({
   head: () => ({ meta: [{ title: "Mesas — MesaGest" }, { name: "description", content: "Configurar mesas, lugares e áreas." }, { property: "og:title", content: "Mesas — MesaGest" }, { property: "og:description", content: "Configurar mesas, lugares e áreas." }] }),
@@ -27,22 +28,53 @@ function Mesas() {
   const [n, setN] = useState({ name: "", seats: 2, area: "" });
   const edit = canManage(role);
 
+  const nowT = new Date().toTimeString().slice(0, 5);
   const refresh = () => qc.invalidateQueries({ queryKey: ["tables"] });
+
+  async function futureReservations(id: string) {
+    const { data, error } = await supabase.from("reservations").select("id,date,time,party_size").eq("table_id", id).gte("date", today).in("status", ["pending", "confirmed", "arrived"]);
+    if (error) throw error;
+    return (data ?? []).filter((r) => r.date > today || (r.date === today && r.time.slice(0, 5) >= nowT));
+  }
+
   async function add(e: React.FormEvent) {
     e.preventDefault();
     const { error } = await supabase.from("tables").insert({ restaurant_id: restaurant.id, name: n.name, seats: n.seats, area: n.area || null });
     if (error) { toast.error("Não foi possível adicionar a mesa."); return; }
     setN({ name: "", seats: 2, area: "" }); refresh();
   }
+
   async function update(id: string, patch: { name?: string; seats?: number; area?: string | null; active?: boolean }) {
-    await supabase.from("tables").update(patch).eq("id", id); refresh();
-  }
-  async function remove(id: string) {
-    if (!confirm("Eliminar esta mesa?")) return;
-    await supabase.from("tables").delete().eq("id", id); refresh();
+    if (patch.seats !== undefined && (!Number.isInteger(patch.seats) || patch.seats < 1)) { toast.error("Indique um número válido de lugares."); return; }
+    const current = tables.data?.find((t) => t.id === id);
+    const reducing = patch.seats !== undefined && current && patch.seats < current.seats;
+    if (patch.active === false || reducing) {
+      try {
+        const future = await futureReservations(id);
+        const affected = patch.active === false ? future : future.filter((r) => r.party_size > patch.seats!);
+        if (affected.length) {
+          toast.error(patch.active === false
+            ? `Esta mesa tem ${affected.length} reserva${affected.length === 1 ? "" : "s"} futura${affected.length === 1 ? "" : "s"}. Reatribua ou cancele antes de a desativar.`
+            : "Há reservas futuras com mais pessoas do que os novos lugares desta mesa.");
+          return;
+        }
+      } catch { toast.error("Não foi possível verificar as reservas desta mesa."); return; }
+    }
+    const { error } = await supabase.from("tables").update(patch).eq("id", id);
+    if (error) { toast.error(reservationErrorMessage(error.message, "Não foi possível atualizar a mesa.")); return; }
+    refresh();
   }
 
-  const nowT = new Date().toTimeString().slice(0, 5);
+  async function remove(id: string) {
+    try {
+      const future = await futureReservations(id);
+      if (future.length) { toast.error(`Esta mesa tem ${future.length} reserva${future.length === 1 ? "" : "s"} futura${future.length === 1 ? "" : "s"}. Reatribua ou cancele antes de a eliminar.`); return; }
+    } catch { toast.error("Não foi possível verificar as reservas desta mesa."); return; }
+    if (!confirm("Eliminar esta mesa? As reservas passadas mantêm-se no histórico.")) return;
+    const { error } = await supabase.from("tables").delete().eq("id", id);
+    if (error) { toast.error(reservationErrorMessage(error.message, "Não foi possível eliminar a mesa.")); return; }
+    toast.success("Mesa eliminada."); refresh();
+  }
   function state(id: string, active: boolean) {
     if (!active) return <Badge variant="muted">Indisponível</Badge>;
     const rs = (res.data ?? []).filter((r) => r.table_id === id);

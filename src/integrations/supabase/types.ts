@@ -448,11 +448,36 @@ export type Database = {
         Args: { _date: string; _party: number; _rid: string; _time: string }
         Returns: string
       }
+      find_free_table_except: {
+        Args: {
+          _date: string
+          _exclude?: string
+          _party: number
+          _rid: string
+          _time: string
+        }
+        Returns: string
+      }
       get_available_slots: {
         Args: { _date: string; _party: number; _slug: string }
         Returns: {
           service: Database["public"]["Enums"]["service_period"]
           slot: string
+        }[]
+      }
+      get_available_tables: {
+        Args: {
+          _date: string
+          _exclude?: string
+          _party: number
+          _rid: string
+          _time: string
+        }
+        Returns: {
+          area: string
+          id: string
+          name: string
+          seats: number
         }[]
       }
       get_public_restaurant: {

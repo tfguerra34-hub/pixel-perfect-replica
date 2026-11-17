@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatDate, formatTime, isoDate } from "@/lib/format";
+import { reservationOverlapsBlock } from "@/lib/reservation-rules";
 
 export const Route = createFileRoute("/_app/bloqueios")({
   head: () => ({ meta: [{ title: "Bloqueios — MesaGest" }, { name: "description", content: "Bloquear dias, serviços, horários e mesas." }, { property: "og:title", content: "Bloqueios — MesaGest" }, { property: "og:description", content: "Bloquear dias, serviços, horários e mesas." }] }),
@@ -24,6 +25,7 @@ function Bloqueios() {
   const qc = useQueryClient();
   const tables = useTables(restaurant.id);
   const [f, setF] = useState({ date: isoDate(new Date()), until: "", kind: "day" as keyof typeof PRESETS, start: "", end: "", table_id: "", reason: "" });
+  const [busy, setBusy] = useState(false);
 
   const list = useQuery({
     queryKey: ["blocks", restaurant.id],
@@ -40,11 +42,26 @@ function Bloqueios() {
     const d = new Date(f.date);
     const last = new Date(f.until || f.date);
     while (d <= last && dates.length < 120) { dates.push(isoDate(d)); d.setDate(d.getDate() + 1); }
+    if (!dates.length) { toast.error("Indique um período de datas válido."); return; }
+
+    setBusy(true);
+    const { data: existing, error: checkError } = await supabase.from("reservations").select("id,customer_name,date,time,table_id").eq("restaurant_id", restaurant.id).in("date", dates).in("status", ["pending", "confirmed", "arrived"]);
+    if (checkError) { setBusy(false); toast.error("Não foi possível verificar as reservas existentes."); return; }
+    const affected = (existing ?? []).filter((r) => (!f.table_id || r.table_id === f.table_id) && reservationOverlapsBlock(r.time, restaurant.table_duration, start || null, end || null));
+    if (affected.length) {
+      const examples = affected.slice(0, 3).map((r) => `${formatDate(r.date)} às ${formatTime(r.time)} — ${r.customer_name}`).join("\n");
+      const proceed = confirm(`Este bloqueio afeta ${affected.length} reserva${affected.length === 1 ? "" : "s"} existente${affected.length === 1 ? "" : "s"}:\n\n${examples}${affected.length > 3 ? "\n…" : ""}\n\nAs reservas não serão canceladas automaticamente. Quer criar o bloqueio na mesma?`);
+      if (!proceed) { setBusy(false); return; }
+    }
+
     const { error } = await supabase.from("blocked_periods").insert(dates.map((date) => ({
       restaurant_id: restaurant.id, date, start_time: start || null, end_time: end || null, table_id: f.table_id || null, reason: f.reason || null,
     })));
+    setBusy(false);
     if (error) { toast.error("Não foi possível criar o bloqueio."); return; }
-    toast.success("Bloqueio criado."); qc.invalidateQueries({ queryKey: ["blocks"] });
+    toast.success(affected.length ? "Bloqueio criado. As reservas existentes foram mantidas." : "Bloqueio criado.");
+    qc.invalidateQueries({ queryKey: ["blocks"] });
+    qc.invalidateQueries({ queryKey: ["available-tables"] });
   }
   async function remove(id: string) {
     await supabase.from("blocked_periods").delete().eq("id", id); qc.invalidateQueries({ queryKey: ["blocks"] });
@@ -73,7 +90,7 @@ function Bloqueios() {
           <div className="space-y-2"><Label>Às</Label><Input type="time" value={f.end} onChange={(e) => setF({ ...f, end: e.target.value })} /></div>
         </>}
         <div className="space-y-2 sm:col-span-2"><Label>Motivo</Label><Input placeholder="Ex.: Evento privado, férias…" value={f.reason} onChange={(e) => setF({ ...f, reason: e.target.value })} /></div>
-        <div className="flex items-end"><Button type="submit" className="w-full"><Ban className="h-4 w-4" />Bloquear</Button></div>
+        <div className="flex items-end"><Button type="submit" className="w-full" disabled={busy}><Ban className="h-4 w-4" />{busy ? "A verificar…" : "Bloquear"}</Button></div>
       </form>
 
       <h2 className="mb-3 mt-8 text-xl font-medium">Próximos bloqueios</h2>

@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { addDays, formatDate, formatLongDate, isoDate } from "@/lib/format";
 import { BRAND } from "@/lib/brand";
 import { cn } from "@/lib/utils";
+import { reservationErrorMessage } from "@/lib/reservation-rules";
 import hero from "@/assets/restaurant-hero.jpg";
 
 export const Route = createFileRoute("/r/$slug")({
@@ -57,7 +58,7 @@ function Booking() {
     setBusy(true);
     const { data, error } = await supabase.rpc("create_public_reservation", { _slug: slug, _date: date, _time: time!, _party: party, _name: f.name, _phone: f.phone, _notes: f.notes });
     setBusy(false);
-    if (error) { setErr(error.message.includes("disponível") ? "Este horário acabou de ficar indisponível. Escolha outro." : "Não foi possível concluir a reserva."); slots.refetch(); return; }
+    if (error) { setErr(reservationErrorMessage(error.message, "Este horário acabou de ficar indisponível. Escolha outro.")); slots.refetch(); return; }
     setDone(data?.[0] ?? null);
   }
 
