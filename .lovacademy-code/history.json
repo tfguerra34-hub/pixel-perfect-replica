@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "updated_at": "2026-11-18T16:04:45.869Z",
+  "messages": [
+    {
+      "role": "user",
+      "text": "podemos criar uma app ?",
+      "attachments": []
+    },
+    {
+      "role": "assistant",
+      "text": "Claro! Podemos criar uma app. Me conta a ideia: o que ela deve fazer e quem vai usar?"
+    }
+  ]
+}
